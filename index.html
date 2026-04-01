@@ -354,29 +354,18 @@
     btn.textContent = 'Sending...';
     btn.disabled = true;
 
-    // 1. Store in Supabase
-    fetch('https://ykfyowmnmljbvbefsjou.supabase.co/rest/v1/demo_requests', {
+    // Submit to Edge Function (stores in DB + sends email via Resend)
+    fetch('https://ykfyowmnmljbvbefsjou.supabase.co/functions/v1/submit-demo', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnlvd21ubWxqYnZiZWZzam91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjI5OTksImV4cCI6MjA5MDEzODk5OX0._sh9eCIBrugODNmxhriTFdd1OhWnQt2t2MeSXp5r_7s',
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrZnlvd21ubWxqYnZiZWZzam91Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NjI5OTksImV4cCI6MjA5MDEzODk5OX0._sh9eCIBrugODNmxhriTFdd1OhWnQt2t2MeSXp5r_7s'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: name, agency_name: agency, email: email, team_size: agents })
-    }).catch(function() {});
-
-    // 2. Email via Formsubmit
-    fetch('https://formsubmit.co/ajax/support@agencybase.ai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ name: name, agency: agency, email: email, 'Team Size': agents, _subject: 'Demo Request from ' + name + ' — ' + agency })
-    }).catch(function() {});
-
-    // Show success state
-    setTimeout(function() {
+    }).then(function() {
       document.getElementById('demoForm').style.display = 'none';
       document.getElementById('demoSuccess').style.display = 'block';
-    }, 600);
+    }).catch(function() {
+      document.getElementById('demoForm').style.display = 'none';
+      document.getElementById('demoSuccess').style.display = 'block';
+    });
   }
 
   document.addEventListener('keydown', function(e) {
